@@ -4,7 +4,7 @@ import sys
 import glob
 import requests
 
-DESDIR = '../cached_网易云音乐'
+DESDIR = '../cached_mp3'
 LRCDIR = os.path.join(DESDIR, 'lyric')
 MSCDIR = os.path.join(DESDIR, 'music')
 
@@ -50,6 +50,7 @@ class netease_music:
     def getInfoFromWeb(self, musicId):
         dic = {}
         url = API+'type=detail&id=' + musicId
+
         info = requests.get(url).json()['songs'][0]
         dic['artist'] = [info['ar'][0]['name']]
         dic['title'] = [info['name']]
@@ -71,7 +72,7 @@ class netease_music:
         artist = dic['artist'][0]
         if artist in title:
             title = title.replace(artist, '').strip()
-        name = (title + '--' + artist)
+        name = (artist + ' - ' + title)
         for i in '>?*/\:"|<':
             name = name.replace(i,'-') # form valid file name
         self.id_mp[musicId] = name
@@ -80,7 +81,9 @@ class netease_music:
         return os.path.join(MSCDIR, name + '.mp3')
     
     def decrypt(self, cachePath):
+        print(cachePath)
         musicId = self.getId(cachePath)
+        print(musicId)
         idpath = os.path.join(MSCDIR, musicId + '.mp3')
         try:  # from web
             dic = self.getInfoFromWeb(musicId)
